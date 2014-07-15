@@ -23,9 +23,8 @@ package datahandler;
  *  -constructors/
  * 
  *  -Data is formatted in the following way:
- *      0   1   2   3   4   5   6   7   8   |      9       |       10+      |
- *                  KEY NAME                 DataTypes.value    Input Data
- * 
+ *      0   1   2   3   |   4   5   6   7   8   9   10  11  |  12  |   13+
+ *      Length of Data                   Key                  Type     Data  
  */
 public class ByteData {
     
@@ -39,12 +38,12 @@ public class ByteData {
      */
     public ByteData(String name, boolean value)throws Error{
         try{
-            array = new byte[10];
+            array = new byte[14];
             writeName(name);
             byte[] buffer;
-            array[8] = DataTypes.booleanData;
+            array[12] = DataTypes.booleanData;
             buffer = ByteWriter.writeBoolean(value);
-            System.arraycopy(buffer, 0, array, 9, 1);
+            System.arraycopy(buffer, 0, array, 13, 1);
         }catch(Error e){
             throw e;
         }
@@ -58,12 +57,12 @@ public class ByteData {
      */
     public ByteData(String name, short value)throws Error{
         try{
-            array = new byte[11];
+            array = new byte[15];
             writeName(name);
             byte[] buffer;
-            array[8] = DataTypes.shortData;
+            array[12] = DataTypes.shortData;
             buffer = ByteWriter.writeShort(value);
-            System.arraycopy(buffer, 0, array, 9, 2);
+            System.arraycopy(buffer, 0, array, 13, 2);
         }catch(Error e){
             throw e;
         }
@@ -77,12 +76,12 @@ public class ByteData {
      */
     public ByteData(String name, char value)throws Error{
         try{
-            array = new byte[11];
+            array = new byte[15];
             writeName(name);
             byte[] buffer;
-            array[8] = DataTypes.charData;
+            array[12] = DataTypes.charData;
             buffer = ByteWriter.writeChar(value);
-            System.arraycopy(buffer, 0, array, 9, 2);
+            System.arraycopy(buffer, 0, array, 13, 2);
         }catch(Error e){
             throw e;
         }
@@ -96,12 +95,12 @@ public class ByteData {
      */
     public ByteData(String name, int value)throws Error{
         try{
-            array = new byte[13];
+            array = new byte[17];
             writeName(name);
             byte[] buffer;
-            array[8] = DataTypes.intData;
+            array[12] = DataTypes.intData;
             buffer = ByteWriter.writeInt(value);
-            System.arraycopy(buffer, 0, array, 9, 4);
+            System.arraycopy(buffer, 0, array, 13, 4);
         }catch(Error e){
             throw e;
         }
@@ -115,12 +114,12 @@ public class ByteData {
      */
     public ByteData(String name, float value)throws Error{
         try{
-            array = new byte[13];
+            array = new byte[17];
             writeName(name);
             byte[] buffer;
-            array[8] = DataTypes.floatData;
+            array[12] = DataTypes.floatData;
             buffer = ByteWriter.writeFloat(value);
-            System.arraycopy(buffer, 0, array, 9, 4);
+            System.arraycopy(buffer, 0, array, 13, 4);
         }catch(Error e){
             throw e;
         }
@@ -134,12 +133,12 @@ public class ByteData {
      */
     public ByteData(String name, double value)throws Error{
         try{
-            array = new byte[17];
+            array = new byte[21];
             writeName(name);
             byte[] buffer;
-            array[8] = DataTypes.doubleData;
+            array[12] = DataTypes.doubleData;
             buffer = ByteWriter.writeDouble(value);
-            System.arraycopy(buffer, 0, array, 9, 8);
+            System.arraycopy(buffer, 0, array, 13, 8);
         }catch(Error e){
             throw e;
         }
@@ -153,12 +152,12 @@ public class ByteData {
      */
     public ByteData(String name, long value)throws Error{
         try{
-            array = new byte[17];
+            array = new byte[21];
             writeName(name);
             byte[] buffer;
-            array[8] = DataTypes.longData;
+            array[12] = DataTypes.longData;
             buffer = ByteWriter.writeLong(value);
-            System.arraycopy(buffer, 0, array, 9, 8);
+            System.arraycopy(buffer, 0, array, 13, 8);
         }catch(Error e){
             throw e;
         }
@@ -172,12 +171,12 @@ public class ByteData {
      */
     public ByteData(String name, String value)throws Error{
         try{
-            array = new byte[9+value.length()];
+            array = new byte[13+value.length()];
             writeName(name);
             byte[] buffer;
-            array[8] = DataTypes.stringData;
+            array[12] = DataTypes.stringData;
             buffer = ByteWriter.writeString(value);
-            System.arraycopy(buffer, 0, array, 9, buffer.length);
+            System.arraycopy(buffer, 0, array, 13, buffer.length);
         }catch(Error e){
             throw e;
         }
@@ -191,12 +190,12 @@ public class ByteData {
      */
     public ByteData(String name, byte[] value)throws Error{
         try{
-            array = new byte[value.length];
+            array = new byte[13+value.length];
             writeName(name);
             byte[] buffer;
-            array[8] = DataTypes.fileData;
+            array[12] = DataTypes.fileData;
             buffer = value;
-            System.arraycopy(buffer, 0, array, 9, buffer.length);
+            System.arraycopy(buffer, 0, array, 13, buffer.length);
         }catch(Error e){
             throw e;
         }
@@ -221,8 +220,11 @@ public class ByteData {
             char[] charBuffer = name.toCharArray();
             for(int i = 0; i < 4; i++){
                 buffer = ByteWriter.writeChar(charBuffer[i]);
-                System.arraycopy(buffer, 0, array, i << 1, 2);
+                System.arraycopy(buffer, 0, array, (i << 1)+4, 2);
             }
+            byte[] length = new byte[4];
+            length = ByteWriter.writeInt(array.length-4);
+            System.arraycopy(length, 0, array, 0, 4);
         }
     }
     

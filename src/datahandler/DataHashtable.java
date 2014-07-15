@@ -6,6 +6,8 @@
 
 package datahandler;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
 
 /**
@@ -17,44 +19,70 @@ import java.util.Hashtable;
  * 
  * Class for interpreting byte[] to readable data.
  */
-public class DataHashtable extends Hashtable{
+public class DataHashtable {
     
+    private Hashtable hashtable = new Hashtable();
+    private InputStream inputStream;
+    
+    public DataHashtable(InputStream stream){
+        inputStream = stream;
+    }
     
     /**
      * 
      * @param byteData - Adds byteData of format ByteData to the hashtable.
      * @return KeyValue interpreted from byte data
-     * @throws Error
+     * @throws Error, IOException
      */
-    public String put(byte[] byteData)throws Error{
+    public String run()throws Error, IOException{
         String key = null;
-        if(byteData.length < 10){
+        byte[] length = new byte[4];
+        inputStream.read(length, 0, 4);
+        int arrayLength = ByteReader.getInt(length);
+        if(arrayLength < 10){
             throw new Error("Insufficient Data Error");
         }else try{
+            byte[] byteData = new byte[arrayLength];
+            inputStream.read(byteData, 0, arrayLength);
             key = (ByteReader.getString(byteData, 0, 8));            
             byte dataType = byteData[8];
-            Object value = (int)0;
             if(dataType == DataTypes.booleanData){
+                boolean value = false;
                 value = (boolean)ByteReader.getBoolean(byteData, 9);
+                hashtable.put(key, value);
             }else if(dataType == DataTypes.charData){
+                char value = '\u0000';
                 value = (char)ByteReader.getChar(byteData, 9);
+                hashtable.put(key, value);
             }else if(dataType == DataTypes.doubleData){
+                double value = 0.0;
                 value = (double)ByteReader.getDouble(byteData, 9);
+                hashtable.put(key, value);
             }else if(dataType == DataTypes.fileData){
-                value = new byte[byteData.length-9];
-                System.arraycopy(byteData, 9, value, byteData.length-9, byteData.length-9);
+                byte[] value = new byte[byteData.length-9];
+                System.arraycopy(byteData, 9, value, 0, byteData.length-9);
+                hashtable.put(key, value);
             }else if(dataType == DataTypes.floatData){
+                float value = 0.0f;
                 value = (float)ByteReader.getFloat(byteData, 9);
+                hashtable.put(key, value);
             }else if(dataType == DataTypes.intData){
+                int value = 0;
                 value = (int)ByteReader.getInt(byteData, 9);
+                hashtable.put(key, value);
             }else if(dataType == DataTypes.longData){
+                long value = 0;
                 value = (long)ByteReader.getLong(byteData, 9);
+                hashtable.put(key, value);
             }else if(dataType == DataTypes.shortData){
+                short value = 0;
                 value = (short)ByteReader.getShort(byteData, 9);
+                hashtable.put(key, value);
             }else if(dataType == DataTypes.stringData){
+                String value = null;
                 value = (String)ByteReader.getString(byteData, 9);
+                hashtable.put(key, value);
             }
-            put(key, value);
         }catch(Error e){
             throw e;
         }
@@ -86,7 +114,7 @@ public class DataHashtable extends Hashtable{
             key = ByteReader.getString(array, 0, 8);
         }else{
         }
-        object = get(key);
+        object = hashtable.get(key);
         return object;
     }
     
